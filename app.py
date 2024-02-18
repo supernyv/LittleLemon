@@ -5,13 +5,16 @@ import dash_ag_grid as dag
 from components.main_navigation_bar import navigation_bar
 from components.database_connector import read_query, write_query
 import plotly.express as px
+##from dash_bootstrap_templates import load_figure_template
 
 #---------------------------------- Initialize the app ----------------------------------#
 app = Dash(
 		title = "Little Lemon App",
-		external_stylesheets = [dbc.themes.CERULEAN]
+		external_stylesheets = [dbc.themes.SANDSTONE]
 		)
 server = app.server
+
+##load_figure_template("sandstone")
 
 #------------------------ Get the list of tables in the database ------------------------#
 
@@ -35,13 +38,20 @@ view_table_pane = [
 	html.P(),
 	dbc.Row(
 		[
-			dbc.Col(html.H6("Select a Table"), width = 2, align = "center"),
+			dbc.Col(html.H6("Selected Table"), width = 2, align = "center"),
 			dbc.Col(table_dropdown, width = 10)
 		]
 		),
 	html.P(),
 	html.P(id = "grid_location"),
 	]
+
+
+graphs_list_switch = dbc.Switch(
+	label = "All tables",
+	value = True,
+	id = "graphs_switch"
+	)
 
 graphics_dropdown = dcc.Dropdown(
 	["Time series", "Bar Chart", "Histogram", "Pie Plot"],
@@ -53,8 +63,9 @@ view_graphics_pane = [
 	html.P(),
 	dbc.Row(
 		[
-			dbc.Col(html.H6("Select a Visualization"), width = 4, align = "center"),
-			dbc.Col(graphics_dropdown, width = 8)
+			dbc.Col(html.H6("Select Graphs"), width = 3, align = "center"),
+			dbc.Col(graphs_list_switch, width = 3, align = "center"),
+			dbc.Col(graphics_dropdown, width = 6)
 		]
 		),
 	html.P(),
