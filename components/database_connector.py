@@ -11,7 +11,7 @@ def get_user_handles(db_user, user_pwd, db = "LittleLemonDB"):
 	cursor = connection.cursor()
 	return connection, cursor
 
-def write_query(user_connection, query_statement):
+def write_query(user_cursor, query_statement):
 	user_cursor.execute(query_statement)
 
 def read_query(user_cursor, query_statement):

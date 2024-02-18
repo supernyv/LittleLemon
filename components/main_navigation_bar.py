@@ -16,7 +16,8 @@ page_buttons = html.Div(
 			"View Data", id = "view_data_button", outline = True,
 			color = "primary", n_clicks = 0
 			)
-	])
+	]
+	)
 
 navigation_bar = dbc.Navbar(
 	dbc.Container(

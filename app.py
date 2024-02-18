@@ -1,4 +1,3 @@
-import os
 import pandas as pd
 from dash import Dash, dcc, html, callback, Input, Output
 import dash_bootstrap_components as dbc
@@ -12,55 +11,82 @@ app = Dash(
 		)
 server = app.server
 
+connection, cursor =  get_user_handles("admin", "admin")
 
-user = os.environ.get("USERNAME").lower()
-connection, cursor =  get_user_handles(user, "admin")
+tables_list = read_query(cursor, """SHOW TABLES""")["Tables_in_littlelemondb"].tolist()
 
-query = f""" SELECT * FROM orders """
-df = read_query(cursor, query)
-
-grid = dag.AgGrid(
-	rowData = df.to_dict('records'),
-	columnDefs = [{"field": i} for i in df.columns],
-	columnSize = "sizeToFit"
-	)
+#------------------------ App layout Components ------------------------#
 
 table_dropdown = dcc.Dropdown(
-	["Orders", "Customers", "Menus", "Menu Items"],
-	"Orders",
-	placeholder = "Select Table"
+	[{"label": " ".join(table.split("_")).title(), "value":table} for table in tables_list],
+	tables_list[0],
+	placeholder = "Select Table",
+	id = "drop_down_for_tables",
+	searchable = False
 	)
-view_table = [
+view_table_pane = [
 	html.P(),
-	table_dropdown,
+	dbc.Row(
+		[
+			dbc.Col(html.H6("Select a Table"), width = 2, align = "center"),
+			dbc.Col(table_dropdown, width = 10)
+		]
+		),
 	html.P(),
-	html.P(grid)
+	html.P(id = "grid_location"),
 	]
 
 graphics_dropdown = dcc.Dropdown(
 	["Time series", "Bar Chart", "Histogram", "Pie Plot"],
 	"Time series",
-	placeholder = "Select Graphics"
+	placeholder = "Select Graphics",
+	searchable = False
 	)
-view_graphics = [
+view_graphics_pane = [
 	html.P(),
-	graphics_dropdown,
+	dbc.Row(
+		[
+			dbc.Col(html.H6("Select a Visualization"), width = 4, align = "center"),
+			dbc.Col(graphics_dropdown, width = 8)
+		]
+		),
 	html.P(),
-	dcc.Graph()
+	dbc.Card(dbc.CardBody(dcc.Graph(id = "graph_location")))
 	]
 
+#------------------------ App Layout ------------------------#
 app.layout = dbc.Container(
 	[
 		dbc.Row(dbc.Col(navigation_bar)),
 		dbc.Row(
 			[
-				dbc.Col(view_table, width = 7),
-				dbc.Col(view_graphics, width = 5)
+				dbc.Col(view_table_pane, width = 7),
+				dbc.Col(view_graphics_pane, width = 5)
 			]
 			)
 	],
 	fluid = True
 )
+
+#------------------------ Callbacks ------------------------#
+
+@callback(
+	Output("grid_location", "children"),
+	Input("drop_down_for_tables", "value")
+	)
+def update_grid_table(selected_table):
+	if not selected_table:
+		return "No table Selected. Kindly select a table from the above dropdown."
+	query = f""" SELECT * FROM {selected_table} """
+	df = read_query(cursor, query)
+
+	grid = dag.AgGrid(
+		rowData = df.to_dict('records'),
+		columnDefs = [{"field": i, "filter":True} for i in df.columns],
+		columnSize = "sizeToFit",
+		style = {"height":"76vh"}
+	)
+	return grid
 
 if __name__ == "__main__":
 	app.run_server(debug = True)
