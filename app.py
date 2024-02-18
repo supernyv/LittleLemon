@@ -27,19 +27,19 @@ def get_df(table_name):
 	return df
 #-------------------------------- App layout Components ---------------------------------#
 
-table_dropdown = dcc.Dropdown(
+tables_dropdown = dcc.Dropdown(
 	[{"label": " ".join(table.split("_")).title(), "value":table} for table in tables_list],
 	tables_list[0],
 	placeholder = "Select Table",
 	id = "drop_down_for_tables",
 	searchable = False
 	)
-view_table_pane = [
+tables_pane = [
 	html.P(),
 	dbc.Row(
 		[
 			dbc.Col(html.H6("Selected Table"), width = 2, align = "center"),
-			dbc.Col(table_dropdown, width = 10)
+			dbc.Col(tables_dropdown, width = 10)
 		]
 		),
 	html.P(),
@@ -53,19 +53,19 @@ graphs_list_switch = dbc.Switch(
 	id = "graphs_switch"
 	)
 
-graphics_dropdown = dcc.Dropdown(
+graphs_dropdown = dcc.Dropdown(
 	["Time series", "Bar Chart", "Histogram", "Pie Plot"],
 	"Time series",
 	placeholder = "Select Graphics",
 	searchable = False
 	)
-view_graphics_pane = [
+graphs_pane = [
 	html.P(),
 	dbc.Row(
 		[
 			dbc.Col(html.H6("Select Graphs"), width = 3, align = "center"),
 			dbc.Col(graphs_list_switch, width = 3, align = "center"),
-			dbc.Col(graphics_dropdown, width = 6)
+			dbc.Col(graphs_dropdown, width = 6)
 		]
 		),
 	html.P(),
@@ -83,8 +83,8 @@ app.layout = dbc.Container(
 		dbc.Row(dbc.Col(navigation_bar)),
 		dbc.Row(
 			[
-				dbc.Col(view_table_pane, width = 7),
-				dbc.Col(view_graphics_pane, width = 5)
+				dbc.Col(tables_pane, width = 7),
+				dbc.Col(graphs_pane, width = 5)
 			]
 			)
 	],
