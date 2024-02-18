@@ -2,25 +2,38 @@ import os
 import mysql.connector as connector
 import pandas as pd;
 
-def get_user_handles(db_user, user_pwd, db = "LittleLemonDB"):
+def get_user_connection(db_user = "admin", user_pwd = "admin", db = "LittleLemonDB"):
 	connection = connector.connect(
 		user = db_user,
 		password = user_pwd,
 		database = db
 	)
-	cursor = connection.cursor()
-	return connection, cursor
+	return connection
 
-def write_query(user_cursor, query_statement):
-	user_cursor.execute(query_statement)
+def handle_connections(query_function):
+	def wrapper(query_statement):
+		connection = get_user_connection("admin", "admin")
+		cursor = connection.cursor(buffered=True)
 
-def read_query(user_cursor, query_statement):
-	user_cursor.execute(query_statement)
-	column_names = user_cursor.column_names
-	rows = user_cursor.fetchall()
+		sql_query = query_function(cursor, query_statement)
+
+		cursor.close()
+		connection.close()
+
+		return sql_query
+	return wrapper
+
+@handle_connections
+def write_query(cursor, query_statement):
+	cursor.execute(query_statement)
+
+@handle_connections
+def read_query(cursor, query_statement):
+	cursor.execute(query_statement)
+	column_names = cursor.column_names
+	rows = cursor.fetchall()
 	df = pd.DataFrame(rows, columns = column_names)
 	return df
 
-def close_user_cursor(user_connection, user_cursor):
-	user_cursor.close()
+def close_user_cursor(user_connection):
 	user_connection.close()
