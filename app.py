@@ -23,8 +23,11 @@ tables_list = read_query("""SHOW TABLES""")["Tables_in_littlelemondb"].tolist()
 #------------------------------------ Get a dataframe -----------------------------------#
 def get_df(table_name):
 	select_data = f""" SELECT * FROM {table_name} """
-	df = read_query(select_data)
-	return df
+	if select_data:
+		df = read_query(select_data)
+		return df
+	else:
+		return None
 #-------------------------------- App layout Components ---------------------------------#
 
 tables_dropdown = dcc.Dropdown(
@@ -52,7 +55,6 @@ graphs_list_switch = dbc.Switch(
 	value = True,
 	id = "graphs_switch"
 	)
-
 graphs_dropdown = dcc.Dropdown(
 	["Time series", "Bar Chart", "Histogram", "Pie Plot"],
 	"Time series",
@@ -63,33 +65,37 @@ graphs_pane = [
 	html.P(),
 	dbc.Row(
 		[
-			dbc.Col(html.H6("Select Graphs"), width = 3, align = "center"),
-			dbc.Col(graphs_list_switch, width = 3, align = "center"),
-			dbc.Col(graphs_dropdown, width = 6)
+		dbc.Col(html.H6("Select Graphs"), width = 3, align = "center"),
+		dbc.Col(graphs_list_switch, width = 3, align = "center"),
+		dbc.Col(graphs_dropdown, width = 6)
 		]
 		),
 	html.P(),
 	dbc.Card(
 		dbc.CardBody(
-			dcc.Graph(id = "graph_location",
-				config = {"displaylogo" : False, "displayModeBar" : False})
-			)
+			dcc.Graph(
+				id = "graph_location",
+				config = {"displaylogo" : False, "displayModeBar" : False},
+				)
+			),
+		color = "secondary",
+		outline = True
 		)
 	]
 
 #----------------------------------- App Layout -----------------------------------#
 app.layout = dbc.Container(
 	[
-		dbc.Row(dbc.Col(navigation_bar)),
-		dbc.Row(
-			[
-				dbc.Col(tables_pane, width = 7),
-				dbc.Col(graphs_pane, width = 5)
-			]
-			)
+	dbc.Row(dbc.Col(navigation_bar)),
+	dbc.Row(
+		[
+		dbc.Col(tables_pane, width = 7),
+		dbc.Col(graphs_pane, width = 5)
+		]
+		)
 	],
 	fluid = True
-)
+	)
 
 #----------------------------------- Callbacks -----------------------------------#
 
@@ -126,7 +132,8 @@ def update_graph(table_name):
 		fig = px.scatter(dummy_df, x = "mx", y = "my")
 
 	fig.update_layout(
-		template = "plotly_white")
+		template = "plotly_white",
+		margin = {"l": 0, "r": 0, "t": 0, "b": 0})
 	fig.update_xaxes(showline=True, linecolor='black')
 	fig.update_yaxes(showline=True, linecolor='black')
 	return fig
