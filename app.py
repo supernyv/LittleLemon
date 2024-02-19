@@ -3,15 +3,17 @@ from dash import Dash, dcc, html, callback, Input, Output
 import dash_bootstrap_components as dbc
 import dash_ag_grid as dag
 from components.main_navigation_bar import navigation_bar
-from components.database_connector import read_query, write_query
+from utils.database_connector import read_query, write_query
 import plotly.express as px
+import os
 ##from dash_bootstrap_templates import load_figure_template
 
 #---------------------------------- Initialize the app ----------------------------------#
 app = Dash(
-		title = "Little Lemon App",
+		title = "Little Lemon",
 		external_stylesheets = [dbc.themes.SANDSTONE]
 		)
+app._favicon = os.path.join("asset", "favicon.ico")
 server = app.server
 
 ##load_figure_template("sandstone")

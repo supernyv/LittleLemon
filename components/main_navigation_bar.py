@@ -2,8 +2,8 @@ import dash_bootstrap_components as dbc
 from dash import html
 import os
 
-logo_path = os.path.join("assets", "lemon_logo.png")
-logo = html.Img(src = logo_path, height = "80px")
+logo_path = os.path.join("assets", "little_lemon_logo.png")
+logo = html.Img(src = logo_path, height = "65px")
 brand = dbc.NavbarBrand("Little Lemon", href = "/")
 
 page_buttons = html.Div(
