@@ -11,7 +11,7 @@ import os
 #---------------------------------- Initialize the app ----------------------------------#
 app = Dash(
 		title = "Little Lemon",
-		external_stylesheets = [dbc.themes.SANDSTONE]
+		external_stylesheets = [dbc.themes.SANDSTONE, dbc.icons.FONT_AWESOME]
 		)
 app._favicon = os.path.join("asset", "favicon.ico")
 server = app.server
@@ -43,8 +43,14 @@ tables_pane = [
 	html.P(),
 	dbc.Row(
 		[
-			dbc.Col(html.H6("Selected Table"), width = 2, align = "center"),
-			dbc.Col(tables_dropdown, width = 10)
+			dbc.Col(
+				[
+				html.I(className="fa fa-solid fa-eye me-2"), #me = margin-end
+				"Selected Table"
+				],
+				width = 3,
+				className = "d-flex align-items-center"),
+			dbc.Col(tables_dropdown, width = 9)
 		]
 		),
 	html.P(),
@@ -67,9 +73,16 @@ graphs_pane = [
 	html.P(),
 	dbc.Row(
 		[
-		dbc.Col(html.H6("Select Graphs"), width = 3, align = "center"),
-		dbc.Col(graphs_list_switch, width = 3, align = "center"),
-		dbc.Col(graphs_dropdown, width = 6)
+		dbc.Col(
+			[
+			html.I(className = "fa fa-solid fa-chart-line me-2"),
+			"Selected Graphs"
+			],
+			width = 4,
+			className = "d-flex align-items-center mb-2" # mb-2 here and 5px for next col to review
+			),
+		dbc.Col(graphs_list_switch, style = {"margin-top":"5px"}),
+		dbc.Col(graphs_dropdown, width = 5)
 		]
 		),
 	html.P(),
