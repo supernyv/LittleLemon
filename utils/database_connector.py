@@ -13,13 +13,12 @@ def handle_connections(query_function):
 		connection = get_user_connection("admin", "admin")
 		if connection:
 			cursor = connection.cursor(buffered=True)
-			sql_query = query_function(cursor, query_statement)
+			query_result = query_function(cursor, query_statement)
 			cursor.close()
 			connection.close()
-			return sql_query
+			return query_result
 		else:
-			print("Nyv, this is the handler's error: ", err)
-			return None
+			return "No access"
 	return wrapper
 
 @handle_connections
@@ -28,8 +27,7 @@ def write_query(cursor, query_statement):
 		cursor.execute(query_statement)
 		return True
 	except connector.Error as err:
-		print("Nyv, this is the connection error: ", err)
-		return False
+		return err
 
 @handle_connections
 def read_query(cursor, query_statement):
@@ -40,5 +38,4 @@ def read_query(cursor, query_statement):
 		df = pd.DataFrame(rows, columns = column_names)
 		return df
 	except connector.Error as err:
-		print("Nyv, this is the query error: ", err)
-		return None
+		return err

@@ -6,8 +6,7 @@ import dash_ag_grid as dag
 import plotly.express as px
 from components.main_navigation_bar import navigation_bar
 from utils.database_connector import read_query, write_query
-from utils.tables_queries import get_df
-from components.graphs import graphs_index
+from components.queries_and_graphs import get_table_df, graphs_index
 
 ##from dash_bootstrap_templates import load_figure_template
 
@@ -111,7 +110,7 @@ app.layout = dbc.Container(
 def update_grid_table(selected_table):
 	if not selected_table:
 		return "No table Selected. Kindly select a table from the above dropdown."
-	gdf = get_df(selected_table)
+	gdf = get_table_df(selected_table)
 
 	grid = dag.AgGrid(
 		rowData = gdf.to_dict('records'),
