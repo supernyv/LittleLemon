@@ -1,5 +1,5 @@
 import mysql.connector as connector
-import pandas as pd;
+import pandas as pd
 
 def get_user_connection(logon = "admin", pwd = "admin", db = "LittleLemonDB"):
 	try:
@@ -18,6 +18,7 @@ def handle_connections(query_function):
 			connection.close()
 			return sql_query
 		else:
+			print("Nyv, this is the handler's error: ", err)
 			return None
 	return wrapper
 
@@ -27,6 +28,7 @@ def write_query(cursor, query_statement):
 		cursor.execute(query_statement)
 		return True
 	except connector.Error as err:
+		print("Nyv, this is the connection error: ", err)
 		return False
 
 @handle_connections
@@ -38,4 +40,5 @@ def read_query(cursor, query_statement):
 		df = pd.DataFrame(rows, columns = column_names)
 		return df
 	except connector.Error as err:
+		print("Nyv, this is the query error: ", err)
 		return None

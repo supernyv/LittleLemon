@@ -1,10 +1,17 @@
-import dash_bootstrap_components as dbc
-from dash import html, callback, Input, Output, ctx
 import os
+from dash import html, Input, Output, callback, ctx
+import dash_bootstrap_components as dbc
 
 logo_path = os.path.join("assets", "little_lemon_logo.png")
 logo = html.Img(src = logo_path, height = "65px")
 brand = dbc.NavbarBrand("Little Lemon", href = "/")
+
+
+theme_switch = dbc.Switch(
+	label = "Dark Mode",
+	value = True,
+	id = "id_theme_switch"
+	) #To be used later or deleted altogether
 
 page_buttons = html.Div(
 	[

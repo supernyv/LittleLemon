@@ -1,11 +1,14 @@
+import os
 import pandas as pd
-from dash import Dash, dcc, html, callback, Input, Output
+from dash import Dash, dcc, html, callback, Input, Output, ctx
 import dash_bootstrap_components as dbc
 import dash_ag_grid as dag
+import plotly.express as px
 from components.main_navigation_bar import navigation_bar
 from utils.database_connector import read_query, write_query
-import plotly.express as px
-import os
+from utils.tables_queries import get_df
+from components.graphs import graphs_index
+
 ##from dash_bootstrap_templates import load_figure_template
 
 #---------------------------------- Initialize the app ----------------------------------#
@@ -21,22 +24,15 @@ server = app.server
 #------------------------ Get the list of tables in the database ------------------------#
 
 tables_list = read_query("""SHOW TABLES""")["Tables_in_littlelemondb"].tolist()
+graphs_list = list(graphs_index.keys())
 
-#------------------------------------ Get a dataframe -----------------------------------#
-def get_df(table_name):
-	select_data = f""" SELECT * FROM {table_name} """
-	if select_data:
-		df = read_query(select_data)
-		return df
-	else:
-		return None
 #-------------------------------- App layout Components ---------------------------------#
 
 tables_dropdown = dcc.Dropdown(
-	[{"label": " ".join(table.split("_")).title(), "value":table} for table in tables_list],
-	tables_list[0],
+	options = [{"label": " ".join(t.split("_")).title(), "value":t} for t in tables_list],
+	value = tables_list[0],
 	placeholder = "Select Table",
-	id = "drop_down_for_tables",
+	id = "id_tables_dropdown",
 	searchable = False
 	)
 tables_pane = [
@@ -54,18 +50,13 @@ tables_pane = [
 		]
 		),
 	html.P(),
-	html.P(id = "grid_location"),
+	dbc.Row(id = "id_grid_location"),
 	]
 
-
-graphs_list_switch = dbc.Switch(
-	label = "All tables",
-	value = True,
-	id = "graphs_switch"
-	)
 graphs_dropdown = dcc.Dropdown(
-	["Time series", "Bar Chart", "Histogram", "Pie Plot"],
-	"Time series",
+	options = [{"label": " ".join(g.split("_")).title(), "value":g} for g in graphs_list],
+	value = graphs_list[0],
+	id = "id_graphs_dropdown",
 	placeholder = "Select Graphics",
 	searchable = False
 	)
@@ -79,17 +70,16 @@ graphs_pane = [
 			"Selected Graphs"
 			],
 			width = 4,
-			className = "d-flex align-items-center mb-2" # mb-2 here and 5px for next col to review
+			className = "d-flex align-items-center"
 			),
-		dbc.Col(graphs_list_switch, style = {"margin-top":"5px"}),
-		dbc.Col(graphs_dropdown, width = 5)
+		dbc.Col(graphs_dropdown, width = 8)
 		]
 		),
 	html.P(),
 	dbc.Card(
 		dbc.CardBody(
 			dcc.Graph(
-				id = "graph_location",
+				id = "id_graphs_location",
 				config = {"displaylogo" : False, "displayModeBar" : False},
 				)
 			),
@@ -115,8 +105,8 @@ app.layout = dbc.Container(
 #----------------------------------- Callbacks -----------------------------------#
 
 @callback(
-	Output("grid_location", "children"),
-	Input("drop_down_for_tables", "value")
+	Output("id_grid_location", "children"),
+	Input("id_tables_dropdown", "value")
 	)
 def update_grid_table(selected_table):
 	if not selected_table:
@@ -131,21 +121,12 @@ def update_grid_table(selected_table):
 	)
 	return grid
 
-
 @callback(
-	Output("graph_location", "figure"),
-	Input("drop_down_for_tables", "value")
+	Output("id_graphs_location", "figure"),
+	Input("id_graphs_dropdown", "value")
 	)
-def update_graph(table_name):
-	if table_name == "orders":
-		data = get_df(table_name)
-		fig = px.scatter(data, x = "order_date", y = "total_quantity")
-	else:
-		dummy_df = pd.DataFrame({
-			"mx":[1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-			"my":[20, 5, 63, 4, 14, 52, 4, 8, 63, 5]})
-		fig = px.scatter(dummy_df, x = "mx", y = "my")
-
+def update_graph(selected_graph):
+	fig = graphs_index[selected_graph]()
 	fig.update_layout(
 		template = "plotly_white",
 		margin = {"l": 0, "r": 0, "t": 0, "b": 0})
