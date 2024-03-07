@@ -39,3 +39,6 @@ def read_query(cursor, query_statement):
 		return df
 	except connector.Error as err:
 		return err
+
+col = 'total_cost'
+print(read_query(f"SELECT {col} FROM orders;"))

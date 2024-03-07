@@ -8,7 +8,7 @@ def get_table_df(table_name):
 	df = read_query(select_data)
 	return df
 #--------------------------------------- Define Queries -------------------------------------#
-def bookings_guests_df():
+def booking_history_df():
 	sql_query = """
 		SELECT
 			booking_date,
@@ -83,9 +83,9 @@ def staff_activity_df():
 	return df
 
 #--------------------------------------- Make Graphs -------------------------------------#
-def bookings_guests():
-	df = bookings_guests_df()
-	graph = px.line(data_frame = df, x = "booking_date", y = "number_of_guests")
+def booking_history():
+	df = booking_history_df()
+	graph = px.scatter(data_frame = df, x = "booking_date", y = "number_of_guests")
 	return graph
 
 def premium_menu():
@@ -109,7 +109,7 @@ def most_active_staff():
 	return graph;
 #------------------------------- Package graphs for import ------------------------------#
 graphs_index = {
-	"bookings_guests" : bookings_guests,
+	"booking_history" : booking_history,
 	"premium_menu" : premium_menu,
 	"menu_sales" : menu_sales,
 	"most_active_staff" : most_active_staff,

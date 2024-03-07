@@ -41,7 +41,7 @@ tables_pane = [
 			dbc.Col(
 				[
 				html.I(className="fa fa-solid fa-eye me-2"), #me = margin-end
-				"Selected Table"
+				"Select Table"
 				],
 				width = 3,
 				className = "d-flex align-items-center"),
@@ -56,7 +56,7 @@ graphs_dropdown = dcc.Dropdown(
 	options = [{"label": " ".join(g.split("_")).title(), "value":g} for g in graphs_list],
 	value = graphs_list[0],
 	id = "id_graphs_dropdown",
-	placeholder = "Select Graphics",
+	placeholder = "Select Graph",
 	searchable = False
 	)
 graphs_pane = [
@@ -66,7 +66,7 @@ graphs_pane = [
 		dbc.Col(
 			[
 			html.I(className = "fa fa-solid fa-chart-line me-2"),
-			"Selected Graphs"
+			"Select Graph"
 			],
 			width = 4,
 			className = "d-flex align-items-center"
@@ -116,7 +116,8 @@ def update_grid_table(selected_table):
 		rowData = gdf.to_dict('records'),
 		columnDefs = [{"field": i, "filter":True} for i in gdf.columns],
 		columnSize = "sizeToFit",
-		style = {"height":"76vh"}
+		style = {"height":"76vh"},
+		defaultColDef = {"editable":True}
 	)
 	return grid
 
